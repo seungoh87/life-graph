@@ -10,6 +10,7 @@ interface GraphStore {
   addPoint: (p: GraphPoint) => void
   updateMemo: (age: number, memo: string) => void
   deletePoint: (age: number) => void
+  setAgeRange: (range: [number, number]) => void
   clearPoints: () => void
   undo: () => void
   redo: () => void
@@ -50,6 +51,10 @@ export const useGraphStore = create<GraphStore>()(
         const points = prev.filter(p => p.age !== age)
         return { graph: { ...s.graph, points }, history, future: [] }
       }),
+
+      setAgeRange: (range) => set((s) => ({
+        graph: { ...s.graph, ageRange: range },
+      })),
 
       clearPoints: () => set((s) => ({
         graph: { ...s.graph, points: [] },

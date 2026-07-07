@@ -11,5 +11,5 @@ export interface LifeGraphData {
 
 export const DEFAULT_GRAPH: LifeGraphData = {
   points: [],
-  ageRange: [0, 80],
+  ageRange: [0, 40],
 }
