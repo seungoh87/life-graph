@@ -45,6 +45,8 @@ export default function MemoPopup({ mode, age, initialMemo, screenX, screenY, co
         ref={inputRef}
         autoComplete="off"
         spellCheck={false}
+        lang="ko"
+        inputMode="text"
         value={text}
         onChange={e => setText(e.target.value.slice(0, 20))}
         onKeyDown={e => {
