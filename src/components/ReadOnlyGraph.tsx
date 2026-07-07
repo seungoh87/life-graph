@@ -2,7 +2,8 @@ import { useEffect, useRef, useCallback } from 'react'
 import * as d3 from 'd3'
 import type { GraphPoint } from '../types/graph'
 
-const M = { top: 24, right: 24, bottom: 56, left: 64 }
+const M_PC = { top: 24, right: 24, bottom: 56, left: 64 }
+const M_MB = { top: 16, right: 24, bottom: 44, left: 44 }
 const FONT = "'Pretendard', -apple-system, sans-serif"
 const UP = '#f6465d', DN = '#2196f3', AVG = '#ff9800'
 const GRID = '#e8e8e8', ZERO = '#cccccc'
@@ -29,6 +30,8 @@ export default function ReadOnlyGraph({ points, ageRange, overlayPoints, overlay
     svg.setAttribute('width', String(W))
     svg.setAttribute('height', String(H))
 
+    const isMobile = W < 480
+    const M = isMobile ? M_MB : M_PC
     const [minAge, maxAge] = ageRange
     const xS = d3.scaleLinear().domain([minAge, maxAge]).range([M.left, W - M.right])
     const yS = d3.scaleLinear().domain([-100, 100]).range([H - M.bottom, M.top])
@@ -44,19 +47,20 @@ export default function ReadOnlyGraph({ points, ageRange, overlayPoints, overlay
       root.append('line').attr('x1', cL).attr('x2', cR).attr('y1', yS(t)).attr('y2', yS(t))
         .attr('stroke', t === 0 ? ZERO : GRID).attr('stroke-width', t === 0 ? 1.5 : 1)
     })
-    const step = (maxAge - minAge) <= 40 ? 5 : 10
+    const fontSize = isMobile ? '12px' : '14px'
+    const step = isMobile ? 10 : ((maxAge - minAge) <= 40 ? 5 : 10)
     d3.range(minAge, maxAge + 1, step).forEach(age => {
       root.append('line').attr('x1', xS(age)).attr('x2', xS(age)).attr('y1', cT).attr('y2', cB)
         .attr('stroke', GRID).attr('stroke-width', 1)
     })
     d3.range(minAge, maxAge + 1, step).forEach(age => {
-      root.append('text').attr('x', xS(age)).attr('y', cB + 20).attr('text-anchor', 'middle')
-        .attr('fill', '#888').attr('font-family', FONT).attr('font-size', '14px').text(`${age}세`)
+      root.append('text').attr('x', xS(age)).attr('y', cB + 18).attr('text-anchor', 'middle')
+        .attr('fill', '#888').attr('font-family', FONT).attr('font-size', fontSize).text(`${age}세`)
     })
     ;[-100, -50, 0, 50, 100].forEach(t => {
       root.append('text').attr('x', cL - 8).attr('y', yS(t) + 4).attr('text-anchor', 'end')
         .attr('fill', t === 0 ? '#111' : '#888').attr('font-family', FONT)
-        .attr('font-size', '14px').attr('font-weight', t === 0 ? '600' : '400')
+        .attr('font-size', fontSize).attr('font-weight', t === 0 ? '600' : '400')
         .text(t > 0 ? `+${t}` : `${t}`)
     })
     root.append('text').attr('x', cL + 4).attr('y', z - 5)

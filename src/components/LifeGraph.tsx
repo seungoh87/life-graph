@@ -5,7 +5,7 @@ import type { GraphPoint } from '../types/graph'
 import MemoPopup from './MemoPopup'
 
 const M_PC = { top: 24, right: 24, bottom: 56, left: 64 }
-const M_MB = { top: 16, right: 12, bottom: 44, left: 36 }
+const M_MB = { top: 16, right: 24, bottom: 44, left: 44 }
 const FONT = "'Pretendard', -apple-system, sans-serif"
 const UP = '#f6465d', DN = '#2196f3', AVG = '#ff9800'
 const GRID = '#e8e8e8', ZERO = '#cccccc'

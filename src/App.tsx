@@ -32,10 +32,8 @@ function GraphCard({ children }: { children: React.ReactNode }) {
   return (
     <div style={{
       position: 'relative', flex: 1, minHeight: 0,
-      margin: '12px 12px 6px',
-      background: '#fff', border: '1px solid #e0e0e0',
-      borderRadius: 8, overflow: 'hidden',
-      boxShadow: '0 1px 6px rgba(0,0,0,0.07)',
+      margin: '4px 0 0',
+      background: '#f5f5f5', overflow: 'hidden',
     }}>
       {children}
     </div>
