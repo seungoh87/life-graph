@@ -170,13 +170,14 @@ export default function App() {
   // ── 편집 뷰 ──
   return pageWrapper(
     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%' }}>
-      <div style={{ display: 'flex', alignItems: 'baseline', gap: 12 }}>
-        <h1 style={{ margin: 0, fontSize: '1.1rem', fontWeight: 700, color: '#111', letterSpacing: '-0.3px' }}>인생 그래프</h1>
-        <span style={{ fontSize: '0.78rem', color: '#aaa' }}>Life Satisfaction Index</span>
-      </div>
-      <div style={{ display: 'flex', gap: 8 }}>
-        {savedGraphs.length > 0 && <HeaderBtn label={`📁 저장 목록 (${savedGraphs.length})`} onClick={() => setShowSavedPanel(true)} />}
-        {savedGraphs.length >= 2 && <HeaderBtn label="📊 평균 비교" onClick={() => setPage('comparison')} />}
+      <h1 style={{ margin: 0, fontSize: '1.1rem', fontWeight: 700, color: '#111', letterSpacing: '-0.3px' }}>인생 그래프</h1>
+      <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+        {(savedGraphs.length > 0 || savedGraphs.length >= 2) && (
+          <button onClick={() => setShowSavedPanel(true)} style={{
+            background: 'none', border: '1px solid #d0d0d0', borderRadius: 6,
+            padding: '6px 10px', cursor: 'pointer', fontSize: '1rem', color: '#555',
+          }}>⋯</button>
+        )}
         <HeaderBtn label="완료" primary onClick={() => setShowSaveDialog(true)} disabled={!hasData} />
       </div>
     </div>,
