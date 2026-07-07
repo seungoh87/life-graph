@@ -17,7 +17,7 @@ interface Props {
 
 export default function MemoPopup({ mode, age, initialMemo, screenX, screenY, containerW, onSave, onDelete, onCancel }: Props) {
   const [text, setText] = useState(initialMemo)
-  const inputRef = useRef<HTMLInputElement>(null)
+  const inputRef = useRef<HTMLTextAreaElement>(null)
 
   useEffect(() => {
     const t = setTimeout(() => inputRef.current?.focus(), 80)
@@ -41,24 +41,24 @@ export default function MemoPopup({ mode, age, initialMemo, screenX, screenY, co
       <div style={{ fontSize: '0.8rem', color: '#999', marginBottom: 8 }}>
         {age}세 메모 {mode === 'edit' ? '수정' : ''}
       </div>
-      <input
+      <textarea
         ref={inputRef}
-        autoComplete="new-password"
-        autoCorrect="off"
-        autoCapitalize="off"
+        autoComplete="off"
         spellCheck={false}
         value={text}
         onChange={e => setText(e.target.value.slice(0, 20))}
         onKeyDown={e => {
-          if (e.key === 'Enter') onSave(text)
+          if (e.key === 'Enter') { e.preventDefault(); onSave(text) }
           if (e.key === 'Escape') onCancel()
         }}
         placeholder="최대 20자"
         maxLength={20}
+        rows={1}
         style={{
           width: '100%', padding: '8px 10px', borderRadius: 7,
           border: '1px solid #ddd', fontSize: '0.9rem', fontFamily: FONT,
-          outline: 'none', marginBottom: 10,
+          outline: 'none', marginBottom: 10, resize: 'none',
+          lineHeight: '1.5',
         }}
       />
       <div style={{ display: 'flex', gap: 6, justifyContent: 'flex-end' }}>
