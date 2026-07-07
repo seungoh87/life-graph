@@ -75,9 +75,7 @@ export default function LifeGraph({ overlayPoints, overlayLabel }: Props) {
       root.append('text').attr('x', xS(age)).attr('y', cB + 18).attr('text-anchor', 'middle')
         .attr('fill', '#888').attr('font-family', FONT).attr('font-size', fontSize).text(`${age}세`)
     })
-    // Y축: 모바일은 0만, PC는 전체
-    const yTicks = isMobile ? [0] : [-100, -50, 0, 50, 100]
-    yTicks.forEach(t => {
+    ;[-100, -50, 0, 50, 100].forEach(t => {
       root.append('text').attr('x', cL - 8).attr('y', yS(t) + 4).attr('text-anchor', 'end')
         .attr('fill', t === 0 ? '#111' : '#888').attr('font-family', FONT)
         .attr('font-size', fontSize).attr('font-weight', t === 0 ? '600' : '400')
