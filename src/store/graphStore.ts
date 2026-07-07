@@ -84,6 +84,16 @@ export const useGraphStore = create<GraphStore>()(
         }
       }),
     }),
-    { name: 'life-graph-data' }
+    {
+      name: 'life-graph-data',
+      version: 1,
+      migrate: (state: unknown) => {
+        const s = state as { graph?: { ageRange?: [number, number] } }
+        if (s?.graph?.ageRange?.[1] === 80) {
+          s.graph.ageRange = [0, 40]
+        }
+        return s
+      },
+    }
   )
 )
