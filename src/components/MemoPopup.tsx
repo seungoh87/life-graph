@@ -43,7 +43,7 @@ export default function MemoPopup({ mode, age, initialMemo, screenX, screenY, co
       </div>
       <input
         ref={inputRef}
-        autoComplete="off"
+        autoComplete="new-password"
         autoCorrect="off"
         autoCapitalize="off"
         spellCheck={false}
