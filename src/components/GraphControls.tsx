@@ -38,8 +38,8 @@ export default function GraphControls() {
       flexShrink: 0, justifyContent: 'space-between', flexWrap: 'wrap',
     }}>
       <div style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
-        <IconBtn label="◀" title="이전으로" onClick={undo} disabled={history.length === 0} />
-        <IconBtn label="▶" title="다음으로" onClick={redo} disabled={future.length === 0} />
+        <IconBtn label="↩" title="실행 취소" onClick={undo} disabled={history.length === 0} />
+        <IconBtn label="↪" title="다시 실행" onClick={redo} disabled={future.length === 0} />
         <span style={{ fontSize: '0.78rem', color: '#aaa', fontFamily: FONT, marginLeft: 2 }}>범위</span>
         <select
           style={selectStyle}
