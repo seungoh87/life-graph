@@ -170,7 +170,7 @@ export default function App() {
     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%' }}>
       <h1 style={{ margin: 0, fontSize: '1.1rem', fontWeight: 700, color: '#111', letterSpacing: '-0.3px' }}>인생 그래프</h1>
       <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
-        {(savedGraphs.length > 0 || savedGraphs.length >= 2) && (
+        {savedGraphs.length > 0 && (
           <button onClick={() => setShowSavedPanel(true)} style={{
             background: 'none', border: '1px solid #d0d0d0', borderRadius: 6,
             padding: '6px 10px', cursor: 'pointer', fontSize: '1rem', color: '#555',
