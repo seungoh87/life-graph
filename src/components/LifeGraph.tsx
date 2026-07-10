@@ -118,7 +118,7 @@ export default function LifeGraph({ overlayPoints, overlayLabel }: Props) {
         .text(overlayLabel ?? '전체 평균')
     }
 
-    // 포인트 + 이모지 + 메모
+    // 포인트 + 이모지
     pts.forEach(d => {
       if (d.age === 0 && d.satisfaction === 0) return
       const cx = xS(d.age), cy = yS(d.satisfaction)
@@ -126,16 +126,52 @@ export default function LifeGraph({ overlayPoints, overlayLabel }: Props) {
       root.append('circle').attr('cx', cx).attr('cy', cy).attr('r', 15)
         .attr('fill', '#fff').attr('stroke', d.satisfaction >= 0 ? UP : DN).attr('stroke-width', 1.5)
       root.append('text').attr('x', cx).attr('y', cy + 9).attr('text-anchor', 'middle').attr('font-size', '18px').text(emoji)
+    })
 
-      if (d.memo) {
-        const above = cy > H / 2
-        const lines: string[] = []
-        for (let i = 0; i < d.memo.length; i += 10) lines.push(d.memo.slice(i, i + 10))
-        const my = above ? cy - 42 : cy + 30
-        const textEl = root.append('text').attr('text-anchor', 'middle')
-          .attr('font-family', FONT).attr('font-size', '13px').attr('font-weight', '500').attr('fill', '#111')
-        lines.forEach((ln, i) => textEl.append('tspan').attr('x', cx).attr('y', my + i * 18).text(ln))
+    // 메모 (겹침 감지 후 위치 조정)
+    const LINE_H = 18, CHAR_W = 7.5
+    type Box = { x1: number; y1: number; x2: number; y2: number }
+    const placed: Box[] = []
+    const overlaps = (a: Box, b: Box) =>
+      !(a.x2 + 4 < b.x1 || b.x2 + 4 < a.x1 || a.y2 + 4 < b.y1 || b.y2 + 4 < a.y1)
+
+    pts.forEach(d => {
+      if (d.age === 0 && d.satisfaction === 0) return
+      if (!d.memo) return
+      const cx = xS(d.age), cy = yS(d.satisfaction)
+      const lines: string[] = []
+      for (let i = 0; i < d.memo.length; i += 10) lines.push(d.memo.slice(i, i + 10))
+      const tw = Math.max(...lines.map(l => l.length)) * CHAR_W
+      const th = lines.length * LINE_H
+      const hw = tw / 2 + 6
+
+      // 기본 방향: 포인트가 아래쪽이면 위에, 위쪽이면 아래에
+      const preferAbove = cy > H / 2
+      const sides = preferAbove ? ['above', 'below'] : ['below', 'above']
+
+      let chosenY = 0
+      let placed_this = false
+
+      for (const side of sides) {
+        const my = side === 'above' ? cy - 24 - th : cy + 30
+        const box: Box = { x1: cx - hw, y1: my, x2: cx + hw, y2: my + th }
+        if (!placed.some(p => overlaps(p, box))) {
+          placed.push(box)
+          chosenY = my
+          placed_this = true
+          break
+        }
       }
+
+      // 양쪽 다 겹치면 기본 위치에 강제 배치 (약간 겹침 감수)
+      if (!placed_this) {
+        chosenY = preferAbove ? cy - 24 - th : cy + 30
+        placed.push({ x1: cx - hw, y1: chosenY, x2: cx + hw, y2: chosenY + th })
+      }
+
+      const textEl = root.append('text').attr('text-anchor', 'middle')
+        .attr('font-family', FONT).attr('font-size', '13px').attr('font-weight', '500').attr('fill', '#333')
+      lines.forEach((ln, i) => textEl.append('tspan').attr('x', cx).attr('y', chosenY + i * LINE_H).text(ln))
     })
 
     // 클릭 이벤트
