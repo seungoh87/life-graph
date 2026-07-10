@@ -97,8 +97,8 @@ export default function LifeGraph({ overlayPoints, overlayLabel }: Props) {
       const uid = `lg-${Math.random().toString(36).slice(2, 7)}`
       defs.append('clipPath').attr('id', `${uid}-up`).append('rect').attr('x', cL).attr('y', cT).attr('width', cR - cL).attr('height', z - cT)
       defs.append('clipPath').attr('id', `${uid}-dn`).append('rect').attr('x', cL).attr('y', z).attr('width', cR - cL).attr('height', cB - z)
-      const line = d3.line<GraphPoint>().x(d => xS(d.age)).y(d => yS(d.satisfaction)).curve(d3.curveCatmullRom.alpha(0.5))
-      const area = d3.area<GraphPoint>().x(d => xS(d.age)).y0(yS(0)).y1(d => yS(d.satisfaction)).curve(d3.curveCatmullRom.alpha(0.5))
+      const line = d3.line<GraphPoint>().x(d => xS(d.age)).y(d => yS(d.satisfaction))
+      const area = d3.area<GraphPoint>().x(d => xS(d.age)).y0(yS(0)).y1(d => yS(d.satisfaction))
       root.append('path').datum(pts).attr('d', area).attr('fill', UP).attr('opacity', 0.10).attr('clip-path', `url(#${uid}-up)`)
       root.append('path').datum(pts).attr('d', area).attr('fill', DN).attr('opacity', 0.10).attr('clip-path', `url(#${uid}-dn)`)
       root.append('path').datum(pts).attr('d', line).attr('fill', 'none').attr('stroke', UP).attr('stroke-width', 2.5).attr('clip-path', `url(#${uid}-up)`)
@@ -107,7 +107,7 @@ export default function LifeGraph({ overlayPoints, overlayLabel }: Props) {
 
     // 오버레이
     if (overlayPoints && overlayPoints.length >= 2) {
-      const line = d3.line<GraphPoint>().x(d => xS(d.age)).y(d => yS(d.satisfaction)).curve(d3.curveCatmullRom.alpha(0.5))
+      const line = d3.line<GraphPoint>().x(d => xS(d.age)).y(d => yS(d.satisfaction))
       root.append('path').datum(overlayPoints).attr('d', line)
         .attr('fill', 'none').attr('stroke', AVG).attr('stroke-width', 2.5).attr('stroke-dasharray', '8,4').attr('opacity', 0.9)
       const lx = cR - 8, ly = cT + 12
