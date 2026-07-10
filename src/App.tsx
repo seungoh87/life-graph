@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import LZString from 'lz-string'
 import LifeGraph from './components/LifeGraph'
 import GraphControls from './components/GraphControls'
 import SaveDialog from './components/SaveDialog'
@@ -53,7 +54,10 @@ export default function App() {
     const hash = window.location.hash
     if (hash.startsWith('#share=')) {
       try {
-        const data: SavedGraph = JSON.parse(decodeURIComponent(atob(hash.slice(7))))
+        const raw = hash.slice(7)
+        const json = LZString.decompressFromEncodedURIComponent(raw)
+          ?? JSON.parse(decodeURIComponent(atob(raw))) // 구버전 URL 호환
+        const data: SavedGraph = typeof json === 'string' ? JSON.parse(json) : json
         setDetailGraph(data)
         setPage('shared')
         history.replaceState(null, '', window.location.pathname)
@@ -69,7 +73,7 @@ export default function App() {
   }
 
   const handleShare = (g: SavedGraph) => {
-    const encoded = btoa(encodeURIComponent(JSON.stringify(g)))
+    const encoded = LZString.compressToEncodedURIComponent(JSON.stringify(g))
     const url = `${window.location.origin}${window.location.pathname}#share=${encoded}`
     navigator.clipboard.writeText(url).then(() => {
       setShareToast(true)
