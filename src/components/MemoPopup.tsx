@@ -71,16 +71,26 @@ export default function MemoPopup({ mode, age, initialMemo, screenX, screenY, co
             fontFamily: FONT, cursor: 'pointer',
           }}>삭제</button>
         )}
-        <button onClick={onCancel} style={{
-          padding: '6px 12px', borderRadius: 6, border: '1px solid #e0e0e0',
-          background: 'transparent', color: '#888', fontSize: '0.8rem',
-          fontFamily: FONT, cursor: 'pointer',
-        }}>취소</button>
-        <button onClick={() => onSave(text)} style={{
-          padding: '6px 12px', borderRadius: 6, border: 'none',
-          background: '#1976d2', color: '#fff', fontSize: '0.8rem',
-          fontFamily: FONT, cursor: 'pointer',
-        }}>{mode === 'edit' ? '수정' : '저장'}</button>
+        {text.trim() ? (
+          <>
+            <button onClick={onCancel} style={{
+              padding: '6px 12px', borderRadius: 6, border: '1px solid #e0e0e0',
+              background: 'transparent', color: '#888', fontSize: '0.8rem',
+              fontFamily: FONT, cursor: 'pointer',
+            }}>취소</button>
+            <button onClick={() => onSave(text)} style={{
+              padding: '6px 12px', borderRadius: 6, border: 'none',
+              background: '#1976d2', color: '#fff', fontSize: '0.8rem',
+              fontFamily: FONT, cursor: 'pointer',
+            }}>{mode === 'edit' ? '수정' : '저장'}</button>
+          </>
+        ) : (
+          <button onClick={onCancel} style={{
+            padding: '6px 12px', borderRadius: 6, border: '1px solid #e0e0e0',
+            background: 'transparent', color: '#888', fontSize: '0.8rem',
+            fontFamily: FONT, cursor: 'pointer',
+          }}>입력 안함</button>
+        )}
       </div>
     </div>
   )
