@@ -273,6 +273,11 @@ export default function LifeGraph({ overlayPoints, overlayLabel }: Props) {
             draw()
           }}
           onCancel={() => setPopup(null)}
+          onCancelDelete={popup.mode === 'new' ? () => {
+            deletePoint(popup.age)
+            setPopup(null)
+            draw()
+          } : undefined}
         />
       )}
     </div>

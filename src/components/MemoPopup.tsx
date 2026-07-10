@@ -13,9 +13,10 @@ interface Props {
   onSave: (memo: string) => void
   onDelete?: () => void
   onCancel: () => void
+  onCancelDelete?: () => void
 }
 
-export default function MemoPopup({ mode, age, initialMemo, screenX, screenY, containerW, onSave, onDelete, onCancel }: Props) {
+export default function MemoPopup({ mode, age, initialMemo, screenX, screenY, containerW, onSave, onDelete, onCancel, onCancelDelete }: Props) {
   const [text, setText] = useState(initialMemo)
   const inputRef = useRef<HTMLTextAreaElement>(null)
 
@@ -85,11 +86,20 @@ export default function MemoPopup({ mode, age, initialMemo, screenX, screenY, co
             }}>{mode === 'edit' ? '수정' : '저장'}</button>
           </>
         ) : (
-          <button onClick={onCancel} style={{
-            padding: '6px 12px', borderRadius: 6, border: '1px solid #e0e0e0',
-            background: 'transparent', color: '#888', fontSize: '0.8rem',
-            fontFamily: FONT, cursor: 'pointer',
-          }}>입력 안함</button>
+          <>
+            {onCancelDelete && (
+              <button onClick={onCancelDelete} style={{
+                padding: '6px 12px', borderRadius: 6, border: '1px solid #fcc',
+                background: 'transparent', color: '#f6465d', fontSize: '0.8rem',
+                fontFamily: FONT, cursor: 'pointer',
+              }}>취소</button>
+            )}
+            <button onClick={onCancel} style={{
+              padding: '6px 12px', borderRadius: 6, border: '1px solid #e0e0e0',
+              background: 'transparent', color: '#888', fontSize: '0.8rem',
+              fontFamily: FONT, cursor: 'pointer',
+            }}>입력 안함</button>
+          </>
         )}
       </div>
     </div>
