@@ -1,4 +1,4 @@
-import { useEffect, useRef, useCallback } from 'react'
+import { useEffect, useRef, useCallback, useState } from 'react'
 import * as d3 from 'd3'
 import type { GraphPoint } from '../types/graph'
 
@@ -17,9 +17,17 @@ interface Props {
   overlayLabel?: string
 }
 
+interface BubbleState {
+  age: number
+  memo: string
+  screenX: number
+  screenY: number
+}
+
 export default function ReadOnlyGraph({ points, ageRange, overlayPoints, overlayLabel }: Props) {
   const containerRef = useRef<HTMLDivElement>(null)
   const svgRef = useRef<SVGSVGElement>(null)
+  const [bubble, setBubble] = useState<BubbleState | null>(null)
 
   const draw = useCallback(() => {
     const svg = svgRef.current, container = containerRef.current
@@ -96,16 +104,45 @@ export default function ReadOnlyGraph({ points, ageRange, overlayPoints, overlay
       root.append('circle').attr('cx', cx).attr('cy', cy).attr('r', 15)
         .attr('fill', '#fff').attr('stroke', d.satisfaction >= 0 ? UP : DN).attr('stroke-width', 1.5)
       root.append('text').attr('x', cx).attr('y', cy + 9).attr('text-anchor', 'middle').attr('font-size', '18px').text(emoji)
+
+      // 메모: PC는 텍스트, 모바일은 파란 점으로 표시
       if (d.memo) {
-        const above = cy > H / 2
-        const lines: string[] = []
-        for (let i = 0; i < d.memo.length; i += 10) lines.push(d.memo.slice(i, i + 10))
-        const my = above ? cy - 42 : cy + 30
-        const textEl = root.append('text').attr('text-anchor', 'middle')
-          .attr('font-family', FONT).attr('font-size', '13px').attr('font-weight', '500').attr('fill', '#111')
-        lines.forEach((ln, i) => textEl.append('tspan').attr('x', cx).attr('y', my + i * 18).text(ln))
+        if (!isMobile) {
+          const above = cy > H / 2
+          const lines: string[] = []
+          for (let i = 0; i < d.memo.length; i += 10) lines.push(d.memo.slice(i, i + 10))
+          const my = above ? cy - 42 : cy + 30
+          const textEl = root.append('text').attr('text-anchor', 'middle')
+            .attr('font-family', FONT).attr('font-size', '13px').attr('font-weight', '500').attr('fill', '#111')
+          lines.forEach((ln, i) => textEl.append('tspan').attr('x', cx).attr('y', my + i * 18).text(ln))
+        } else {
+          root.append('circle').attr('cx', cx + 10).attr('cy', cy - 10).attr('r', 4)
+            .attr('fill', '#1976d2').attr('stroke', '#fff').attr('stroke-width', 1.5)
+        }
       }
     })
+
+    // 모바일: 터치로 말풍선 표시
+    if (isMobile) {
+      root.append('rect')
+        .attr('x', cL).attr('y', cT).attr('width', cR - cL).attr('height', cB - cT)
+        .attr('fill', 'transparent')
+        .on('click', (event: MouseEvent) => {
+          const [mx, my] = d3.pointer(event)
+          const touched = points.find(p =>
+            !(p.age === 0 && p.satisfaction === 0) &&
+            Math.abs(xS(p.age) - mx) < 22 && Math.abs(yS(p.satisfaction) - my) < 22
+          )
+          if (touched?.memo) {
+            setBubble(b => b?.age === touched.age ? null : {
+              age: touched.age, memo: touched.memo!,
+              screenX: xS(touched.age), screenY: yS(touched.satisfaction),
+            })
+          } else {
+            setBubble(null)
+          }
+        })
+    }
   }, [points, ageRange, overlayPoints, overlayLabel])
 
   useEffect(() => { draw() }, [draw])
@@ -117,9 +154,41 @@ export default function ReadOnlyGraph({ points, ageRange, overlayPoints, overlay
     return () => { window.removeEventListener('resize', onResize); clearTimeout(timer) }
   }, [draw])
 
+  const cw = containerRef.current?.clientWidth ?? 600
+
   return (
     <div ref={containerRef} style={{ position: 'absolute', inset: 0, overflow: 'hidden' }}>
       <svg ref={svgRef} style={{ position: 'absolute', top: 0, left: 0 }} />
+
+      {bubble && (() => {
+        const bw = 200
+        let left = bubble.screenX - bw / 2
+        let top = bubble.screenY - 70
+        if (left < 8) left = 8
+        if (left + bw > cw - 8) left = cw - bw - 8
+        const above = top >= 8
+        if (!above) top = bubble.screenY + 24
+        return (
+          <div style={{
+            position: 'absolute', left, top, width: bw, zIndex: 200,
+            background: '#222', color: '#fff', borderRadius: 10,
+            padding: '10px 14px', fontFamily: FONT, fontSize: '0.88rem',
+            fontWeight: 500, lineHeight: 1.5, pointerEvents: 'none',
+            boxShadow: '0 4px 16px rgba(0,0,0,0.25)',
+          }}>
+            <div style={{ fontSize: '0.72rem', color: '#aaa', marginBottom: 4 }}>{bubble.age}세 메모</div>
+            {bubble.memo}
+            <div style={{
+              position: 'absolute',
+              left: '50%', transform: 'translateX(-50%)',
+              width: 0, height: 0,
+              ...(above
+                ? { bottom: -8, borderLeft: '8px solid transparent', borderRight: '8px solid transparent', borderTop: '8px solid #222' }
+                : { top: -8, borderLeft: '8px solid transparent', borderRight: '8px solid transparent', borderBottom: '8px solid #222' }),
+            }} />
+          </div>
+        )
+      })()}
     </div>
   )
 }
