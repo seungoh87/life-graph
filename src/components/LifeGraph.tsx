@@ -139,7 +139,7 @@ export default function LifeGraph({ overlayPoints, overlayLabel }: Props) {
     })
 
     // 클릭 이벤트
-    root.append('rect')
+    const overlay = root.append('rect')
       .attr('x', cL).attr('y', cT).attr('width', cR - cL).attr('height', cB - cT)
       .attr('fill', 'transparent').attr('cursor', 'crosshair')
       .on('click', (event: MouseEvent) => {
@@ -167,6 +167,39 @@ export default function LifeGraph({ overlayPoints, overlayLabel }: Props) {
           screenX: mx, screenY: my,
         })
       })
+
+    // PC 전용 마우스 미리보기
+    if (!isMobile) {
+      const hLine = root.append('line').attr('stroke', '#aaa').attr('stroke-width', 1)
+        .attr('stroke-dasharray', '4,3').attr('pointer-events', 'none').attr('visibility', 'hidden')
+      const vLine = root.append('line').attr('stroke', '#aaa').attr('stroke-width', 1)
+        .attr('stroke-dasharray', '4,3').attr('pointer-events', 'none').attr('visibility', 'hidden')
+      const tip = root.append('g').attr('pointer-events', 'none').attr('visibility', 'hidden')
+      const tipRect = tip.append('rect').attr('rx', 6).attr('fill', 'rgba(20,20,20,0.78)').attr('height', 30).attr('y', -15)
+      const tipText = tip.append('text').attr('fill', '#fff').attr('font-family', FONT)
+        .attr('font-size', '13px').attr('font-weight', '600').attr('dominant-baseline', 'middle').attr('text-anchor', 'middle').attr('y', 1)
+
+      overlay.on('mousemove', (event: MouseEvent) => {
+        const [mx, my] = d3.pointer(event)
+        const age = Math.max(minAge, Math.min(maxAge, Math.round(xS.invert(mx))))
+        const sat = Math.max(-100, Math.min(100, Math.round(yS.invert(my))))
+        const label = `${age}세  ${sat >= 0 ? '+' : ''}${sat}`
+        tipText.text(label)
+        const tw = (tipText.node() as SVGTextElement)?.getBBox().width ?? 80
+        const pw = tw + 24
+        tipRect.attr('width', pw).attr('x', -pw / 2)
+        const tx = Math.max(cL + pw / 2 + 4, Math.min(cR - pw / 2 - 4, mx))
+        const ty = my < cT + 44 ? my + 38 : my - 22
+        tip.attr('transform', `translate(${tx},${ty})`).attr('visibility', 'visible')
+        hLine.attr('x1', cL).attr('x2', cR).attr('y1', my).attr('y2', my).attr('visibility', 'visible')
+        vLine.attr('x1', mx).attr('x2', mx).attr('y1', cT).attr('y2', cB).attr('visibility', 'visible')
+      })
+      overlay.on('mouseleave', () => {
+        tip.attr('visibility', 'hidden')
+        hLine.attr('visibility', 'hidden')
+        vLine.attr('visibility', 'hidden')
+      })
+    }
   }, [graph, overlayPoints, overlayLabel, addPoint])
 
   useEffect(() => { draw() }, [draw])
